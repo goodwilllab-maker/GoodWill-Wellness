@@ -429,10 +429,23 @@ List specific Indian foods and ingredients to avoid given the medical conditions
 WELLNESS TIPS:
 Give 10 personalised tips covering: Ayurvedic morning routine, seasonal dos and don'ts, stress management, sleep hygiene, yoga or pranayama suited to the goals, Indian home remedies relevant to the medical conditions, and gut health advice.`;
 
+    const apiKey = localStorage.getItem('gw_apikey') || '';
+    if (!apiKey) {
+      const key = prompt('Enter your Anthropic API key to generate plans:\n(Get one free at console.anthropic.com)\n\nIt will be saved on this device only.');
+      if (!key) { btn.disabled = false; btn.innerHTML = '<span class="btn-icon">🌿</span> Generate my personalised plan'; return; }
+      localStorage.setItem('gw_apikey', key.trim());
+    }
+    const finalKey = localStorage.getItem('gw_apikey');
+
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': finalKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 4000,
@@ -454,8 +467,9 @@ Give 10 personalised tips covering: Ayurvedic morning routine, seasonal dos and 
       document.getElementById('content-tips').innerHTML = `<div class="result-text">${extract('WELLNESS TIPS', 'ZZZNOMATCH')}</div>`;
 
     } catch (err) {
+      localStorage.removeItem('gw_apikey');
       tabs.forEach(t => {
-        document.getElementById('content-' + t).innerHTML = `<div style="padding:20px;color:#C0392B;font-size:14px;">⚠️ Something went wrong. Please check your internet connection and try again.</div>`;
+        document.getElementById('content-' + t).innerHTML = `<div style="padding:20px;color:#C0392B;font-size:14px;">⚠️ Could not generate plan. API key may be invalid.<br><br>Click Generate plan again to re-enter your API key.<br><br><small>Get a free key at console.anthropic.com</small></div>`;
       });
     }
 
