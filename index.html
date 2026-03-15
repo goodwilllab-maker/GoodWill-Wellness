@@ -8,126 +8,92 @@
   <title>GoodWill Wellness</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --green: #1B6B3A;
-      --green-mid: #2E8B57;
-      --green-light: #E8F5EE;
-      --green-dark: #144d2b;
-      --orange: #E07B2A;
-      --bg: #F7FAF8;
-      --card: #FFFFFF;
-      --border: #D8E8DF;
-      --text: #1A1A1A;
-      --muted: #5A6B5F;
-      --radius: 12px;
-      --shadow: 0 2px 12px rgba(27,107,58,0.08);
+      --green: #1B6B3A; --green-mid: #2E8B57; --green-light: #E8F5EE;
+      --green-dark: #144d2b; --orange: #E07B2A; --bg: #F7FAF8;
+      --card: #FFFFFF; --border: #D8E8DF; --text: #1A1A1A;
+      --muted: #5A6B5F; --radius: 12px; --shadow: 0 2px 12px rgba(27,107,58,0.08);
     }
     html { scroll-behavior: smooth; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-
-    /* HEADER */
     .top-bar { background: var(--green); padding: 14px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-    .top-bar .logo { width: 36px; height: 36px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .top-bar .logo span { font-size: 20px; }
+    .top-bar .logo { width: 36px; height: 36px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
     .top-bar h1 { color: white; font-size: 18px; font-weight: 600; }
     .top-bar p { color: rgba(255,255,255,0.7); font-size: 12px; }
-
-    /* PROGRESS BAR */
     .progress-wrap { background: var(--green-dark); padding: 8px 20px; }
     .progress-bar { height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
     .progress-fill { height: 100%; background: #7ED4A0; border-radius: 2px; transition: width 0.4s ease; width: 0%; }
     .progress-label { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 4px; }
-
-    /* MAIN */
     .app { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; }
-
-    /* SECTION CARD */
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
     .card-title { font-size: 11px; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
     .card-title::before { content: ''; display: block; width: 3px; height: 14px; background: var(--green); border-radius: 2px; }
-
-    /* GRID */
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
     @media (max-width: 500px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
-
-    /* FIELDS */
     .field { display: flex; flex-direction: column; gap: 5px; }
     label { font-size: 12px; font-weight: 500; color: var(--muted); }
-    input, select, textarea {
-      width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit;
-      border: 1.5px solid var(--border); border-radius: 8px; background: #FAFCFB;
-      color: var(--text); transition: border-color 0.2s;
-    }
+    input, select, textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--border); border-radius: 8px; background: #FAFCFB; color: var(--text); transition: border-color 0.2s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green-mid); background: white; }
     textarea { resize: vertical; min-height: 72px; }
-
-    /* BMI */
-    .bmi-row { font-size: 13px; color: var(--muted); margin-top: 8px; padding: 8px 12px; background: var(--green-light); border-radius: 8px; display: none; }
-
-    /* GOAL CHIPS */
+    .bmi-row { font-size: 13px; margin-top: 8px; padding: 8px 12px; background: var(--green-light); border-radius: 8px; display: none; }
     .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--muted); background: white; cursor: pointer; transition: all 0.15s; user-select: none; }
     .chip:hover { border-color: var(--green-mid); color: var(--green); }
     .chip.active { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 500; }
-
-    /* GENERATE BUTTON */
-    .gen-btn {
-      width: 100%; padding: 16px; background: var(--green); color: white;
-      border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600;
-      cursor: pointer; font-family: inherit; transition: background 0.2s; margin-top: 4px;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
+    .speed-note { text-align: center; margin-top: 10px; }
+    .speed-badge { display: inline-flex; align-items: center; gap: 5px; background: #FFF3E0; color: var(--orange); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
+    .gen-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .gen-btn:hover { background: var(--green-dark); }
     .gen-btn:disabled { background: #8EB89E; cursor: not-allowed; }
-    .gen-btn .btn-icon { font-size: 18px; }
-
-    /* RESULTS */
     .result-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 20px; box-shadow: var(--shadow); overflow: hidden; display: none; }
-    .result-header { background: var(--green); padding: 16px 20px; }
+    .result-header { background: var(--green); padding: 16px 20px 12px; }
     .result-header h2 { color: white; font-size: 16px; font-weight: 600; }
-    .result-header p { color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 2px; }
-    .tabs { display: flex; gap: 0; overflow-x: auto; background: #F0F7F3; border-bottom: 1px solid var(--border); }
-    .tab-btn { padding: 12px 18px; font-size: 13px; font-weight: 500; color: var(--muted); background: transparent; border: none; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; font-family: inherit; transition: all 0.15s; }
+    .result-header p { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 3px; }
+    .action-bar { display: flex; gap: 8px; padding: 10px 14px; background: #F0F7F3; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .act-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: 2px solid; transition: all 0.15s; text-decoration: none; }
+    .act-pdf { background: white; border-color: #E53935; color: #E53935; }
+    .act-pdf:hover { background: #FFEBEE; }
+    .act-wa { background: white; border-color: #25D366; color: #128C7E; }
+    .act-wa:hover { background: #E8F5E9; }
+    .act-copy { background: white; border-color: var(--green-mid); color: var(--green); }
+    .act-copy:hover { background: var(--green-light); }
+    .tabs { display: flex; overflow-x: auto; background: #F8FBF9; border-bottom: 1px solid var(--border); }
+    .tab-btn { padding: 11px 14px; font-size: 13px; font-weight: 500; color: var(--muted); background: transparent; border: none; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; font-family: inherit; transition: all 0.15s; }
     .tab-btn:hover { color: var(--green); }
     .tab-btn.active { color: var(--green); border-bottom-color: var(--green); background: white; }
     .tab-pane { display: none; padding: 20px; }
     .tab-pane.active { display: block; }
-    .result-text { font-size: 14px; line-height: 1.85; color: var(--text); white-space: pre-wrap; }
-
-    /* LOADING */
-    .loading { text-align: center; padding: 40px 20px; color: var(--muted); }
-    .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 12px; }
+    .result-text { font-size: 14px; line-height: 1.9; color: var(--text); white-space: pre-wrap; }
+    .tab-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--border); margin-left: 4px; vertical-align: middle; }
+    .tab-dot.loading { background: var(--orange); animation: pulse 1s infinite; }
+    .tab-dot.done { background: #4CAF50; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.2} }
+    .loading { text-align: center; padding: 30px 20px; color: var(--muted); }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading p { font-size: 14px; }
-
-    /* FOOTER */
-    .foot { text-align: center; padding: 32px 20px 16px; color: var(--muted); font-size: 12px; }
+    .foot { text-align: center; padding: 24px 20px 20px; color: var(--muted); font-size: 12px; }
     .foot strong { color: var(--green); }
-
-    /* INSTALL BANNER */
     .install-banner { background: var(--orange); color: white; padding: 10px 16px; font-size: 13px; display: none; align-items: center; justify-content: space-between; gap: 10px; }
-    .install-banner button { background: white; color: var(--orange); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+    .install-banner button { background: white; color: var(--orange); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .install-banner.show { display: flex; }
   </style>
 </head>
 <body>
 
 <div class="install-banner" id="installBanner">
-  <span>📲 Install GoodWill Wellness on your device for quick access!</span>
+  <span>📲 Install GoodWill Wellness for quick access!</span>
   <button onclick="installApp()">Install</button>
 </div>
 
 <div class="top-bar">
-  <div class="logo"><span>🌿</span></div>
-  <div>
-    <h1>GoodWill Wellness</h1>
-    <p>Your personal Indian health companion</p>
-  </div>
+  <div class="logo">🌿</div>
+  <div><h1>GoodWill Wellness</h1><p>Your personal Indian health companion</p></div>
 </div>
-
 <div class="progress-wrap">
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   <div class="progress-label" id="progressLabel">Fill in your details to get started</div>
@@ -135,158 +101,85 @@
 
 <div class="app">
 
-  <!-- Personal Details -->
   <div class="card">
     <div class="card-title">Personal details</div>
     <div class="grid2" style="margin-bottom:12px">
-      <div class="field">
-        <label>Full name</label>
-        <input type="text" id="name" placeholder="Your name" oninput="updateProgress()" />
-      </div>
-      <div class="field">
-        <label>Age</label>
-        <input type="number" id="age" placeholder="e.g. 28" min="5" max="100" oninput="updateProgress(); calcBMI()" />
-      </div>
+      <div class="field"><label>Full name</label><input type="text" id="name" placeholder="Your name" oninput="updateProgress()" /></div>
+      <div class="field"><label>Age</label><input type="number" id="age" placeholder="e.g. 28" min="5" max="100" oninput="updateProgress();calcBMI()" /></div>
     </div>
     <div class="grid3">
-      <div class="field">
-        <label>Gender</label>
-        <select id="gender" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Weight (kg)</label>
-        <input type="number" id="weight" placeholder="e.g. 70" oninput="calcBMI(); updateProgress()" />
-      </div>
-      <div class="field">
-        <label>Height (cm)</label>
-        <input type="number" id="height" placeholder="e.g. 170" oninput="calcBMI(); updateProgress()" />
-      </div>
+      <div class="field"><label>Gender</label>
+        <select id="gender" onchange="updateProgress()"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+      <div class="field"><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 70" oninput="calcBMI();updateProgress()" /></div>
+      <div class="field"><label>Height (cm)</label><input type="number" id="height" placeholder="e.g. 170" oninput="calcBMI();updateProgress()" /></div>
     </div>
     <div class="bmi-row" id="bmiRow"></div>
   </div>
 
-  <!-- Health & Lifestyle -->
   <div class="card">
     <div class="card-title">Health & lifestyle</div>
     <div class="grid2" style="margin-bottom:12px">
-      <div class="field">
-        <label>Activity level</label>
-        <select id="activity" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Sedentary (desk job, no exercise)</option>
-          <option>Lightly active (1–3 days/week)</option>
-          <option>Moderately active (3–5 days/week)</option>
-          <option>Very active (6–7 days/week)</option>
-          <option>Athlete / daily intense training</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Diet preference</label>
-        <select id="diet" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Pure vegetarian</option>
-          <option>Eggetarian</option>
-          <option>Non-vegetarian</option>
-          <option>Vegan</option>
-          <option>Jain vegetarian</option>
-        </select>
-      </div>
+      <div class="field"><label>Activity level</label>
+        <select id="activity" onchange="updateProgress()"><option value="">Select</option><option>Sedentary (desk job, no exercise)</option><option>Lightly active (1-3 days/week)</option><option>Moderately active (3-5 days/week)</option><option>Very active (6-7 days/week)</option><option>Athlete / daily intense training</option></select></div>
+      <div class="field"><label>Diet preference</label>
+        <select id="diet" onchange="updateProgress()"><option value="">Select</option><option>Pure vegetarian</option><option>Eggetarian</option><option>Non-vegetarian</option><option>Vegan</option><option>Jain vegetarian</option></select></div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
-      <div class="field">
-        <label>Current season</label>
-        <select id="season" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Summer (Mar–Jun)</option>
-          <option>Monsoon (Jul–Sep)</option>
-          <option>Winter (Oct–Feb)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Region / cuisine preference</label>
-        <select id="region">
-          <option value="">Any Indian</option>
-          <option>North Indian</option>
-          <option>South Indian</option>
-          <option>East Indian</option>
-          <option>West Indian / Maharashtrian</option>
-          <option>Gujarati</option>
-          <option>Punjabi</option>
-        </select>
-      </div>
+      <div class="field"><label>Current season</label>
+        <select id="season" onchange="updateProgress()"><option value="">Select</option><option>Summer (Mar-Jun)</option><option>Monsoon (Jul-Sep)</option><option>Winter (Oct-Feb)</option></select></div>
+      <div class="field"><label>Region / cuisine</label>
+        <select id="region"><option value="">Any Indian</option><option>North Indian</option><option>South Indian</option><option>East Indian</option><option>West Indian / Maharashtrian</option><option>Gujarati</option><option>Punjabi</option></select></div>
     </div>
-    <div class="field">
-      <label>Medical conditions / allergies</label>
-      <textarea id="medical" placeholder="e.g. Diabetes Type 2, hypertension, lactose intolerant, PCOD, thyroid..."></textarea>
-    </div>
+    <div class="field"><label>Medical conditions / allergies</label>
+      <textarea id="medical" placeholder="e.g. Diabetes Type 2, hypertension, lactose intolerant, PCOD, thyroid..."></textarea></div>
   </div>
 
-  <!-- Goals -->
   <div class="card">
     <div class="card-title">Your goals</div>
     <div class="chip-grid" id="goalGrid">
-      <div class="chip" data-goal="Weight loss">⚖️ Weight loss</div>
-      <div class="chip" data-goal="Muscle gain">💪 Muscle gain</div>
-      <div class="chip" data-goal="Maintain weight">🎯 Maintain weight</div>
-      <div class="chip" data-goal="Improve stamina">🏃 Improve stamina</div>
-      <div class="chip" data-goal="Manage diabetes">🩺 Manage diabetes</div>
-      <div class="chip" data-goal="Improve digestion">🌿 Improve digestion</div>
-      <div class="chip" data-goal="Boost immunity">🛡️ Boost immunity</div>
-      <div class="chip" data-goal="Stress relief">🧘 Stress relief</div>
-      <div class="chip" data-goal="Better sleep">😴 Better sleep</div>
-      <div class="chip" data-goal="Healthy skin & hair">✨ Skin & hair</div>
+      <div class="chip" data-goal="Weight loss">Weight loss</div>
+      <div class="chip" data-goal="Muscle gain">Muscle gain</div>
+      <div class="chip" data-goal="Maintain weight">Maintain weight</div>
+      <div class="chip" data-goal="Improve stamina">Stamina</div>
+      <div class="chip" data-goal="Manage diabetes">Manage diabetes</div>
+      <div class="chip" data-goal="Improve digestion">Digestion</div>
+      <div class="chip" data-goal="Boost immunity">Immunity</div>
+      <div class="chip" data-goal="Stress relief">Stress relief</div>
+      <div class="chip" data-goal="Better sleep">Better sleep</div>
+      <div class="chip" data-goal="Healthy skin and hair">Skin and hair</div>
     </div>
   </div>
 
-  <!-- Workout -->
   <div class="card">
     <div class="card-title">Workout preference</div>
     <div class="grid2">
-      <div class="field">
-        <label>Workout type</label>
-        <select id="workout" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Home workout (no equipment)</option>
-          <option>Home workout (basic equipment)</option>
-          <option>Gym workout</option>
-          <option>Yoga / stretching only</option>
-          <option>Outdoor (running/cycling)</option>
-          <option>No workout preference</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Fitness level</label>
-        <select id="fitness" onchange="updateProgress()">
-          <option value="">Select</option>
-          <option>Beginner</option>
-          <option>Intermediate</option>
-          <option>Advanced</option>
-        </select>
-      </div>
+      <div class="field"><label>Workout type</label>
+        <select id="workout" onchange="updateProgress()"><option value="">Select</option><option>Home workout (no equipment)</option><option>Home workout (basic equipment)</option><option>Gym workout</option><option>Yoga / stretching only</option><option>Outdoor (running/cycling)</option><option>No workout preference</option></select></div>
+      <div class="field"><label>Fitness level</label>
+        <select id="fitness" onchange="updateProgress()"><option value="">Select</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
     </div>
+    <div class="speed-note"><span class="speed-badge">⚡ Fast mode — all 4 sections generate together in ~15 seconds</span></div>
   </div>
 
   <button class="gen-btn" id="genBtn" onclick="generatePlan()">
-    <span class="btn-icon">🌿</span>
-    Generate my personalised plan
+    <span>🌿</span> Generate my personalised plan
   </button>
 
-  <!-- Results -->
   <div class="result-card" id="resultCard">
     <div class="result-header">
-      <h2 id="resultTitle">Your personalised plan is ready</h2>
-      <p id="resultSubtitle">Scroll through the tabs below</p>
+      <h2 id="resultTitle">Your personalised wellness plan</h2>
+      <p id="resultSubtitle">Generating all sections simultaneously...</p>
+    </div>
+    <div class="action-bar" id="actionBar" style="display:none">
+      <button class="act-btn act-pdf" onclick="downloadPDF()">📄 Download PDF</button>
+      <button class="act-btn act-wa" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      <button class="act-btn act-copy" onclick="shareNative()">📤 Share / Copy</button>
     </div>
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('diet', this)">🥗 Diet Plan</button>
-      <button class="tab-btn" onclick="switchTab('workout', this)">🏋️ Workout</button>
-      <button class="tab-btn" onclick="switchTab('avoid', this)">🚫 Foods to Avoid</button>
-      <button class="tab-btn" onclick="switchTab('tips', this)">💡 Wellness Tips</button>
+      <button class="tab-btn active" onclick="switchTab('diet',this)">Diet Plan <span class="tab-dot" id="dot-diet"></span></button>
+      <button class="tab-btn" onclick="switchTab('workout',this)">Workout <span class="tab-dot" id="dot-workout"></span></button>
+      <button class="tab-btn" onclick="switchTab('avoid',this)">Foods to Avoid <span class="tab-dot" id="dot-avoid"></span></button>
+      <button class="tab-btn" onclick="switchTab('tips',this)">Wellness Tips <span class="tab-dot" id="dot-tips"></span></button>
     </div>
     <div id="pane-diet" class="tab-pane active"><div id="content-diet"></div></div>
     <div id="pane-workout" class="tab-pane"><div id="content-workout"></div></div>
@@ -297,192 +190,303 @@
 </div>
 
 <div class="foot">
-  <strong>GoodWill Wellness</strong> · AI-powered Indian health planner<br>
-  <span style="font-size:11px;opacity:0.7">Results are for guidance only. Always consult a doctor for medical advice.</span>
+  <strong>GoodWill Wellness</strong> &middot; AI-powered Indian health planner<br>
+  <span style="opacity:0.7">For guidance only. Always consult a doctor for medical decisions.</span><br>
+  <button onclick="resetKey()" style="margin-top:8px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">Change API key</button>
 </div>
 
 <script>
-  const goals = new Set();
-  let deferredPrompt = null;
+const goals = new Set();
+let planData = { name:'', bmi:'', goalsText:'', diet:'', workout:'', avoid:'', tips:'' };
+let deferredPrompt = null;
 
-  // PWA install prompt
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBanner').classList.add('show');
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('installBanner').classList.remove('show'); });
+}
+
+document.getElementById('goalGrid').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const g = c.dataset.goal;
+  if (goals.has(g)) { goals.delete(g); c.classList.remove('active'); }
+  else { goals.add(g); c.classList.add('active'); }
+  updateProgress();
+});
+
+function calcBMI() {
+  const w = parseFloat(document.getElementById('weight').value);
+  const h = parseFloat(document.getElementById('height').value) / 100;
+  const row = document.getElementById('bmiRow');
+  if (!w || !h) { row.style.display = 'none'; return; }
+  const bmi = (w / (h * h)).toFixed(1);
+  let cat = '', color = '';
+  if (bmi < 18.5) { cat = 'Underweight'; color = '#E07B2A'; }
+  else if (bmi < 25) { cat = 'Healthy weight'; color = '#1B6B3A'; }
+  else if (bmi < 30) { cat = 'Overweight'; color = '#E07B2A'; }
+  else { cat = 'Obese - please consult a doctor'; color = '#C0392B'; }
+  row.style.display = 'block';
+  row.innerHTML = 'BMI: <strong style="color:' + color + '">' + bmi + '</strong> &nbsp;|&nbsp; <span style="color:' + color + '">' + cat + '</span>';
+}
+
+function updateProgress() {
+  const fields = ['age','gender','weight','height','activity','diet','season','workout','fitness'];
+  const filled = fields.filter(id => document.getElementById(id).value).length;
+  const pct = Math.round(((filled + (goals.size ? 1 : 0)) / (fields.length + 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  const msgs = ['Fill in your details','Keep going...','Looking great!','Almost there!','Ready to generate!'];
+  document.getElementById('progressLabel').textContent = pct + '% complete - ' + msgs[pct < 20 ? 0 : pct < 40 ? 1 : pct < 65 ? 2 : pct < 90 ? 3 : 4];
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setDot(id, state) {
+  const d = document.getElementById('dot-' + id);
+  d.className = 'tab-dot' + (state === 'loading' ? ' loading' : state === 'done' ? ' done' : '');
+}
+
+function resetKey() {
+  localStorage.removeItem('gw_apikey');
+  alert('API key cleared. You will be asked for a new one next time you generate.');
+}
+
+async function generatePlan() {
+  const age = document.getElementById('age').value;
+  const gender = document.getElementById('gender').value;
+  const weight = document.getElementById('weight').value;
+  const height = document.getElementById('height').value;
+  if (!age || !gender || !weight || !height) { alert('Please fill in age, gender, weight, and height at minimum.'); return; }
+
+  let apiKey = localStorage.getItem('gw_apikey') || '';
+  if (!apiKey) {
+    const k = prompt('Enter your Anthropic API key to generate plans.\n\nGet one free at: console.anthropic.com\n\nYour key is saved only on this device.');
+    if (!k) return;
+    localStorage.setItem('gw_apikey', k.trim());
+    apiKey = k.trim();
+  }
+
+  const name = document.getElementById('name').value.trim() || 'User';
+  const activity = document.getElementById('activity').value;
+  const diet = document.getElementById('diet').value;
+  const season = document.getElementById('season').value;
+  const region = document.getElementById('region').value;
+  const medical = document.getElementById('medical').value.trim();
+  const workout = document.getElementById('workout').value;
+  const fitness = document.getElementById('fitness').value;
+  const bmi = height ? (weight / ((height / 100) ** 2)).toFixed(1) : 'N/A';
+  const goalsText = goals.size ? [...goals].join(', ') : 'General health';
+
+  planData = { name, bmi, goalsText, diet: '', workout: '', avoid: '', tips: '' };
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Generating all 4 sections in parallel...';
+
+  const rc = document.getElementById('resultCard');
+  rc.style.display = 'block';
+  document.getElementById('actionBar').style.display = 'none';
+  rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.getElementById('resultTitle').textContent = name + "'s personalised wellness plan";
+  document.getElementById('resultSubtitle').textContent = 'BMI ' + bmi + ' | Goals: ' + goalsText + ' | Generating...';
+
+  ['diet','workout','avoid','tips'].forEach(t => {
+    document.getElementById('content-' + t).innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating your ' + t + ' plan...</p></div>';
+    setDot(t, 'loading');
   });
 
-  function installApp() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        deferredPrompt = null;
-        document.getElementById('installBanner').classList.remove('show');
-      });
-    }
-  }
+  const profile = age + 'yr ' + gender + ', ' + weight + 'kg, ' + height + 'cm, BMI ' + bmi + ', ' +
+    (diet || 'any diet') + ', ' + (activity || 'moderate activity') + ', ' + (season || 'current season') + ', ' +
+    (region || 'Indian') + ' cuisine, goals: ' + goalsText + ', medical: ' + (medical || 'none') + ', ' +
+    (workout || 'any workout') + ', ' + (fitness || 'beginner') + ' level';
 
-  // Goal chips
-  document.getElementById('goalGrid').addEventListener('click', e => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    const g = chip.dataset.goal;
-    if (goals.has(g)) { goals.delete(g); chip.classList.remove('active'); }
-    else { goals.add(g); chip.classList.add('active'); }
-    updateProgress();
+  const callAI = (system, user) => fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 900,
+      system: system,
+      messages: [{ role: 'user', content: user }]
+    })
+  }).then(r => r.json()).then(d => {
+    if (d.error) throw new Error(d.error.message);
+    return d.content && d.content[0] ? d.content[0].text : '';
   });
 
-  // BMI calculator
-  function calcBMI() {
-    const w = parseFloat(document.getElementById('weight').value);
-    const h = parseFloat(document.getElementById('height').value) / 100;
-    const row = document.getElementById('bmiRow');
-    if (!w || !h || h <= 0) { row.style.display = 'none'; return; }
-    const bmi = (w / (h * h)).toFixed(1);
-    let cat = '', color = '';
-    if (bmi < 18.5) { cat = 'Underweight'; color = '#E07B2A'; }
-    else if (bmi < 25) { cat = 'Healthy weight'; color = '#1B6B3A'; }
-    else if (bmi < 30) { cat = 'Overweight'; color = '#E07B2A'; }
-    else { cat = 'Obese — please consult a doctor'; color = '#C0392B'; }
-    row.style.display = 'block';
-    row.innerHTML = `BMI: <strong style="color:${color}">${bmi}</strong> &nbsp;·&nbsp; <span style="color:${color}">${cat}</span>`;
-  }
-
-  // Progress tracker
-  function updateProgress() {
-    const fields = ['age', 'gender', 'weight', 'height', 'activity', 'diet', 'season', 'workout', 'fitness'];
-    const filled = fields.filter(id => document.getElementById(id).value).length;
-    const goalsBonus = goals.size > 0 ? 1 : 0;
-    const total = fields.length + 1;
-    const pct = Math.round(((filled + goalsBonus) / total) * 100);
-    document.getElementById('progressFill').style.width = pct + '%';
-    const labels = ['Fill in your details to get started', 'Keep going...', 'Looking great!', 'Almost there!', 'Ready to generate your plan!'];
-    const li = pct < 20 ? 0 : pct < 40 ? 1 : pct < 65 ? 2 : pct < 90 ? 3 : 4;
-    document.getElementById('progressLabel').textContent = `${pct}% complete · ${labels[li]}`;
-  }
-
-  function switchTab(tab, btn) {
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('pane-' + tab).classList.add('active');
-    btn.classList.add('active');
-  }
-
-  function loadingHTML(msg) {
-    return `<div class="loading"><div class="spinner"></div><p>${msg}</p></div>`;
-  }
-
-  async function generatePlan() {
-    const age = document.getElementById('age').value;
-    const gender = document.getElementById('gender').value;
-    const weight = document.getElementById('weight').value;
-    const height = document.getElementById('height').value;
-    if (!age || !gender || !weight || !height) {
-      alert('Please fill in at least your age, gender, weight, and height.');
-      return;
+  const tasks = [
+    {
+      key: 'diet',
+      system: 'You are an experienced Indian nutritionist and dietitian. Write in plain text only. No asterisks, no hashes, no bullet symbols.',
+      user: 'Create a 7-day Indian diet plan for: ' + profile + '. For each day write: Day X: Breakfast (item + portion) | Mid-morning snack | Lunch (item + portion) | Evening snack | Dinner (item + portion). Add approximate calories per day. End with 2 seasonal hydration tips.'
+    },
+    {
+      key: 'workout',
+      system: 'You are a certified fitness trainer. Write in plain text only. No asterisks, no hashes, no bullet symbols.',
+      user: 'Create a 7-day ' + (workout || 'home') + ' workout plan for: ' + profile + '. Each day: Day name, then list 4-6 exercises with sets x reps or duration. Include 1 rest day. Add a 5-min warm-up and 5-min cool-down routine at the end.'
+    },
+    {
+      key: 'avoid',
+      system: 'You are an Indian nutritionist. Write in plain text only. No asterisks, no hashes, no bullet symbols.',
+      user: 'List Indian foods and ingredients to avoid for: ' + profile + '. Group them into these categories: Grains and Carbs, Dairy, Street Food and Snacks, Beverages, Oils and Fats. For each food: name it, give a short reason why to avoid it, and suggest one healthier Indian alternative.'
+    },
+    {
+      key: 'tips',
+      system: 'You are an Ayurvedic wellness coach. Write in plain text only. No asterisks, no hashes, no bullet symbols.',
+      user: 'Give 8 personalised wellness tips for: ' + profile + '. Cover: Ayurvedic morning routine, seasonal food and lifestyle tips, stress management, sleep improvement, yoga or pranayama recommendation, relevant Indian home remedies, gut health, and a motivational closing tip.'
     }
+  ];
 
-    const name = document.getElementById('name').value.trim() || 'User';
-    const activity = document.getElementById('activity').value;
-    const diet = document.getElementById('diet').value;
-    const season = document.getElementById('season').value;
-    const region = document.getElementById('region').value;
-    const medical = document.getElementById('medical').value.trim();
-    const workout = document.getElementById('workout').value;
-    const fitness = document.getElementById('fitness').value;
-    const bmi = height ? (weight / ((height / 100) ** 2)).toFixed(1) : 'N/A';
-    const goalsText = goals.size ? [...goals].join(', ') : 'General health';
+  let doneCount = 0;
 
-    const btn = document.getElementById('genBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="btn-icon">⏳</span> Generating your plan...';
+  const promises = tasks.map(task =>
+    callAI(task.system, task.user)
+      .then(text => {
+        planData[task.key] = text;
+        document.getElementById('content-' + task.key).innerHTML = '<div class="result-text">' + text + '</div>';
+        setDot(task.key, 'done');
+        doneCount++;
+        btn.innerHTML = '<span>⏳</span> ' + doneCount + ' of 4 sections ready...';
+        if (doneCount === 4) {
+          document.getElementById('actionBar').style.display = 'flex';
+          document.getElementById('resultSubtitle').textContent = 'BMI ' + bmi + ' | ' + goalsText + ' | All sections ready';
+          btn.innerHTML = '<span>🔄</span> Regenerate plan';
+          btn.disabled = false;
+        }
+      })
+      .catch(() => {
+        document.getElementById('content-' + task.key).innerHTML =
+          '<div style="padding:16px;color:#C0392B;font-size:13px;">Could not generate this section. Please tap Regenerate.</div>';
+        setDot(task.key, '');
+      })
+  );
 
-    const rc = document.getElementById('resultCard');
-    rc.style.display = 'block';
-    rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  await Promise.allSettled(promises);
 
-    const tabs = ['diet', 'workout', 'avoid', 'tips'];
-    tabs.forEach(t => { document.getElementById('content-' + t).innerHTML = loadingHTML('Creating your personalised plan...'); });
+  if (doneCount === 0) {
+    localStorage.removeItem('gw_apikey');
+    alert('All sections failed. Your API key may be invalid. Please try again and re-enter your key.');
+  }
 
-    document.getElementById('resultTitle').textContent = `${name}'s personalised wellness plan`;
-    document.getElementById('resultSubtitle').textContent = `BMI ${bmi} · ${goalsText}`;
-
-    const prompt = `You are an expert Indian nutritionist, Ayurvedic wellness coach, and certified fitness trainer. Create a detailed, highly personalised plan for:
-
-Name: ${name} | Age: ${age} | Gender: ${gender} | Weight: ${weight}kg | Height: ${height}cm | BMI: ${bmi}
-Activity level: ${activity || 'Not specified'} | Diet preference: ${diet || 'Not specified'}
-Current season: ${season || 'Not specified'} | Region/cuisine: ${region || 'Any Indian'}
-Medical conditions / allergies: ${medical || 'None mentioned'}
-Goals: ${goalsText} | Workout type: ${workout || 'Not specified'} | Fitness level: ${fitness || 'Not specified'}
-
-Generate FOUR sections. Each section starts with its header in CAPITALS followed by a colon on its own line.
-
-DIET PLAN:
-Provide a full 7-day Indian meal plan suited to the ${season || 'current'} season. For each day include: Breakfast, Mid-morning snack, Lunch, Evening snack, and Dinner. Use traditional Indian foods appropriate to ${region || 'Indian'} cuisine. Include approximate portions (e.g. 1 katori, 2 rotis), estimated calories per meal, and daily total. Add a hydration section at the end.
-
-WORKOUT PLAN:
-Create a detailed weekly exercise schedule for ${workout || 'general fitness'} at ${fitness || 'beginner'} level. For each day: list exercises with sets × reps or duration. Include rest days. Add a 5-minute warm-up and cool-down routine. Note any exercise modifications for the medical conditions mentioned.
-
-FOODS TO AVOID:
-List specific Indian foods and ingredients to avoid given the medical conditions, goals, and dietary needs. Group by category (Grains & carbs, Dairy, Street food & snacks, Beverages, Oils & fats). For each item explain briefly why to avoid it, and suggest a healthier Indian alternative.
-
-WELLNESS TIPS:
-Give 10 personalised tips covering: Ayurvedic morning routine, seasonal dos and don'ts, stress management, sleep hygiene, yoga or pranayama suited to the goals, Indian home remedies relevant to the medical conditions, and gut health advice.`;
-
-    const apiKey = localStorage.getItem('gw_apikey') || '';
-    if (!apiKey) {
-      const key = prompt('Enter your Anthropic API key to generate plans:\n(Get one free at console.anthropic.com)\n\nIt will be saved on this device only.');
-      if (!key) { btn.disabled = false; btn.innerHTML = '<span class="btn-icon">🌿</span> Generate my personalised plan'; return; }
-      localStorage.setItem('gw_apikey', key.trim());
-    }
-    const finalKey = localStorage.getItem('gw_apikey');
-
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': finalKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-      const data = await res.json();
-      const text = data.content?.map(b => b.text || '').join('') || '';
-
-      const extract = (label, next) => {
-        const re = new RegExp(`${label}:[\\s\\S]*?(?=${next}:|$)`, 'i');
-        const m = text.match(re);
-        return m ? m[0].replace(new RegExp(`^${label}:`, 'i'), '').trim() : text;
-      };
-
-      document.getElementById('content-diet').innerHTML = `<div class="result-text">${extract('DIET PLAN', 'WORKOUT PLAN')}</div>`;
-      document.getElementById('content-workout').innerHTML = `<div class="result-text">${extract('WORKOUT PLAN', 'FOODS TO AVOID')}</div>`;
-      document.getElementById('content-avoid').innerHTML = `<div class="result-text">${extract('FOODS TO AVOID', 'WELLNESS TIPS')}</div>`;
-      document.getElementById('content-tips').innerHTML = `<div class="result-text">${extract('WELLNESS TIPS', 'ZZZNOMATCH')}</div>`;
-
-    } catch (err) {
-      localStorage.removeItem('gw_apikey');
-      tabs.forEach(t => {
-        document.getElementById('content-' + t).innerHTML = `<div style="padding:20px;color:#C0392B;font-size:14px;">⚠️ Could not generate plan. API key may be invalid.<br><br>Click Generate plan again to re-enter your API key.<br><br><small>Get a free key at console.anthropic.com</small></div>`;
-      });
-    }
-
+  if (doneCount < 4) {
     btn.disabled = false;
-    btn.innerHTML = '<span class="btn-icon">🔄</span> Regenerate plan';
+    btn.innerHTML = '<span>🔄</span> Regenerate plan';
+  }
+}
+
+/* PDF DOWNLOAD */
+function downloadPDF() {
+  if (!window.jspdf) { alert('PDF library loading, please try again in a moment.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const margin = 14;
+  const maxW = W - margin * 2;
+
+  doc.setFillColor(27, 107, 58);
+  doc.rect(0, 0, W, 30, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+  doc.text('GoodWill Wellness', margin, 14);
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text('Personalised Indian Wellness Plan', margin, 22);
+  doc.setFontSize(9);
+  doc.text(planData.name + '  |  BMI ' + planData.bmi + '  |  ' + planData.goalsText, W - margin, 22, { align: 'right' });
+  doc.text('Generated: ' + new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }), W - margin, 28, { align: 'right' });
+
+  let y = 38;
+
+  const sections = [
+    { title: 'DIET PLAN (7-DAY)', key: 'diet', r: 46, g: 125, b: 50 },
+    { title: 'WORKOUT PLAN', key: 'workout', r: 27, g: 107, b: 58 },
+    { title: 'FOODS TO AVOID', key: 'avoid', r: 198, g: 40, b: 40 },
+    { title: 'WELLNESS TIPS', key: 'tips', r: 20, g: 77, b: 43 }
+  ];
+
+  sections.forEach(s => {
+    const text = planData[s.key] || '';
+    if (!text) return;
+    if (y > 255) { doc.addPage(); y = 15; }
+    doc.setFillColor(s.r, s.g, s.b);
+    doc.rect(margin, y, maxW, 9, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text(s.title, margin + 3, y + 6.2);
+    y += 13;
+    doc.setTextColor(25, 25, 25);
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(line => {
+      if (y > 278) { doc.addPage(); y = 15; }
+      doc.text(line, margin, y);
+      y += 4.8;
+    });
+    y += 7;
+  });
+
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    doc.setFillColor(240, 247, 243);
+    doc.rect(0, 284, W, 13, 'F');
+    doc.setFontSize(8); doc.setTextColor(100, 120, 110);
+    doc.text('GoodWill Wellness  |  Page ' + i + ' of ' + pages + '  |  For guidance only - always consult your doctor', W / 2, 290, { align: 'center' });
   }
 
-  // Service worker registration
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    });
+  doc.save('GoodWill_Wellness_' + (planData.name || 'Plan') + '.pdf');
+}
+
+/* WHATSAPP SHARE */
+function shareWhatsApp() {
+  const text = buildShareText();
+  const encoded = encodeURIComponent(text);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const url = isMobile ? 'whatsapp://send?text=' + encoded : 'https://web.whatsapp.com/send?text=' + encoded;
+  window.open(url, '_blank');
+}
+
+/* NATIVE SHARE / COPY */
+async function shareNative() {
+  const text = buildShareText();
+  if (navigator.share) {
+    try { await navigator.share({ title: planData.name + "'s GoodWill Wellness Plan", text: text }); return; } catch(e) {}
   }
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Plan copied to clipboard! Paste it anywhere - WhatsApp, Email, Notes, Telegram...');
+  } catch(e) {
+    alert('Could not copy automatically. Please manually select and copy the plan text.');
+  }
+}
+
+function buildShareText() {
+  return 'GoodWill Wellness Plan for ' + planData.name + '\n' +
+    'BMI: ' + planData.bmi + ' | Goals: ' + planData.goalsText + '\n' +
+    'Generated: ' + new Date().toLocaleDateString('en-IN') + '\n\n' +
+    '--- DIET PLAN ---\n' + (planData.diet || 'Not generated') + '\n\n' +
+    '--- WORKOUT PLAN ---\n' + (planData.workout || 'Not generated') + '\n\n' +
+    '--- FOODS TO AVOID ---\n' + (planData.avoid || 'Not generated') + '\n\n' +
+    '--- WELLNESS TIPS ---\n' + (planData.tips || 'Not generated') + '\n\n' +
+    'Generated by GoodWill Wellness';
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
 </script>
 </body>
 </html>
