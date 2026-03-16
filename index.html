@@ -192,7 +192,7 @@
 <div class="foot">
   <strong>GoodWill Wellness</strong> &middot; AI-powered Indian health planner<br>
   <span style="opacity:0.7">For guidance only. Always consult a doctor for medical decisions.</span><br>
-  <button onclick="resetKey()" style="margin-top:8px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">Change API key</button>
+  <button onclick="resetKey()" style="margin-top:8px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">Change Gemini API key</button>
 </div>
 
 <script>
@@ -256,7 +256,7 @@ function setDot(id, state) {
 
 function resetKey() {
   localStorage.removeItem('gw_apikey');
-  alert('API key cleared. You will be asked for a new one next time you generate.');
+  alert('Gemini API key cleared. You will be asked for a new one next time you generate.');
 }
 
 async function generatePlan() {
@@ -268,7 +268,7 @@ async function generatePlan() {
 
   let apiKey = localStorage.getItem('gw_apikey') || '';
   if (!apiKey) {
-    const k = prompt('Enter your Anthropic API key to generate plans.\n\nGet one free at: console.anthropic.com\n\nYour key is saved only on this device.');
+    const k = prompt('Enter your Google Gemini API key.\n\nGet it free at: aistudio.google.com/apikey\n\nYour key is saved only on this device.');
     if (!k) return;
     localStorage.setItem('gw_apikey', k.trim());
     apiKey = k.trim();
@@ -309,23 +309,19 @@ async function generatePlan() {
     (region || 'Indian') + ' cuisine, goals: ' + goalsText + ', medical: ' + (medical || 'none') + ', ' +
     (workout || 'any workout') + ', ' + (fitness || 'beginner') + ' level';
 
-  const callAI = (system, user) => fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 900,
-      system: system,
-      messages: [{ role: 'user', content: user }]
-    })
-  }).then(r => r.json()).then(d => {
+  const callAI = (system, user) => fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: system + '\n\n' + user }] }],
+        generationConfig: { maxOutputTokens: 900, temperature: 0.7 }
+      })
+    }
+  ).then(r => r.json()).then(d => {
     if (d.error) throw new Error(d.error.message);
-    return d.content && d.content[0] ? d.content[0].text : '';
+    return d.candidates && d.candidates[0] ? d.candidates[0].content.parts[0].text : '';
   });
 
   const tasks = [
@@ -379,7 +375,7 @@ async function generatePlan() {
 
   if (doneCount === 0) {
     localStorage.removeItem('gw_apikey');
-    alert('All sections failed. Your API key may be invalid. Please try again and re-enter your key.');
+    alert('All sections failed. Your Gemini API key may be invalid. Please try again and re-enter your key.');
   }
 
   if (doneCount < 4) {
