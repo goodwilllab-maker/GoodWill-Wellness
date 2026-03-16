@@ -310,18 +310,20 @@ async function generatePlan() {
     (workout || 'any workout') + ', ' + (fitness || 'beginner') + ' level';
 
   const callAI = (system, user) => fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + apiKey,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: system + '\n\n' + user }] }],
-        generationConfig: { maxOutputTokens: 900, temperature: 0.7 }
+        system_instruction: { parts: [{ text: system }] },
+        contents: [{ role: 'user', parts: [{ text: user }] }],
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
       })
     }
   ).then(r => r.json()).then(d => {
-    if (d.error) throw new Error(d.error.message);
-    return d.candidates && d.candidates[0] ? d.candidates[0].content.parts[0].text : '';
+    if (d.error) throw new Error('Gemini error: ' + d.error.code + ' - ' + d.error.message);
+    if (!d.candidates || !d.candidates[0]) throw new Error('No response from Gemini. Response: ' + JSON.stringify(d).substring(0,200));
+    return d.candidates[0].content.parts[0].text;
   });
 
   const tasks = [
@@ -364,9 +366,9 @@ async function generatePlan() {
           btn.disabled = false;
         }
       })
-      .catch(() => {
+      .catch((err) => {
         document.getElementById('content-' + task.key).innerHTML =
-          '<div style="padding:16px;color:#C0392B;font-size:13px;">Could not generate this section. Please tap Regenerate.</div>';
+          '<div style="padding:16px;color:#C0392B;font-size:13px;">Could not generate this section.<br><small style="color:#888">' + (err.message || 'Unknown error') + '</small></div>';
         setDot(task.key, '');
       })
   );
