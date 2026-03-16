@@ -161,6 +161,18 @@
     <div class="speed-note"><span class="speed-badge">⚡ Fast mode — all 4 sections generate together in ~15 seconds</span></div>
   </div>
 
+  <div class="card" id="apiKeyCard">
+    <div class="card-title">Groq API key</div>
+    <div class="field">
+      <label>Paste your free Groq key below (get it at console.groq.com)</label>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="apiKeyInput" placeholder="Paste gsk_... key here" style="flex:1" />
+        <button onclick="toggleKey()" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:13px">Show</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Free steps: <strong>console.groq.com</strong> → Sign up with Google → API Keys → Create Key → Paste above</div>
+    </div>
+  </div>
+
   <button class="gen-btn" id="genBtn" onclick="generatePlan()">
     <span>🌿</span> Generate my personalised plan
   </button>
@@ -254,6 +266,13 @@ function setDot(id, state) {
   d.className = 'tab-dot' + (state === 'loading' ? ' loading' : state === 'done' ? ' done' : '');
 }
 
+function toggleKey() {
+  const inp = document.getElementById('apiKeyInput');
+  const btn = event.target;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
+}
+
 function resetKey() {
   localStorage.removeItem('gw_apikey');
   alert('Groq API key cleared. You will be asked for a new one next time you generate.');
@@ -317,7 +336,7 @@ async function generatePlan() {
         'Authorization': 'Bearer ' + apiKey
       },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user }
