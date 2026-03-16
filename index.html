@@ -192,7 +192,7 @@
 <div class="foot">
   <strong>GoodWill Wellness</strong> &middot; AI-powered Indian health planner<br>
   <span style="opacity:0.7">For guidance only. Always consult a doctor for medical decisions.</span><br>
-  <button onclick="resetKey()" style="margin-top:8px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">Change Gemini API key</button>
+  <button onclick="resetKey()" style="margin-top:8px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline">Change Groq API key</button>
 </div>
 
 <script>
@@ -256,7 +256,7 @@ function setDot(id, state) {
 
 function resetKey() {
   localStorage.removeItem('gw_apikey');
-  alert('Gemini API key cleared. You will be asked for a new one next time you generate.');
+  alert('Groq API key cleared. You will be asked for a new one next time you generate.');
 }
 
 async function generatePlan() {
@@ -268,7 +268,7 @@ async function generatePlan() {
 
   let apiKey = localStorage.getItem('gw_apikey') || '';
   if (!apiKey) {
-    const k = prompt('Enter your Google Gemini API key.\n\nGet it free at: aistudio.google.com/apikey\n\nYour key is saved only on this device.');
+    const k = prompt('Enter your Groq API key.\n\nGet it FREE at: console.groq.com\n1. Sign up with Google\n2. Click API Keys → Create API Key\n3. Copy and paste here\n\nKey starts with: gsk_');
     if (!k) return;
     localStorage.setItem('gw_apikey', k.trim());
     apiKey = k.trim();
@@ -309,37 +309,27 @@ async function generatePlan() {
     (region || 'Indian') + ' cuisine, goals: ' + goalsText + ', medical: ' + (medical || 'none') + ', ' +
     (workout || 'any workout') + ', ' + (fitness || 'beginner') + ' level';
 
-  const GEMINI_MODELS = [
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-pro'
-  ];
-
   const callAI = async (system, user) => {
-    let lastError = '';
-    for (const model of GEMINI_MODELS) {
-      try {
-        const r = await fetch(
-          'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ role: 'user', parts: [{ text: system + '\n\n' + user }] }],
-              generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
-            })
-          }
-        );
-        const d = await r.json();
-        if (d.error) { lastError = model + ': ' + d.error.code + ' - ' + d.error.message; continue; }
-        if (d.candidates && d.candidates[0] && d.candidates[0].content) {
-          return d.candidates[0].content.parts[0].text;
-        }
-        lastError = model + ': empty response';
-      } catch(e) { lastError = model + ': ' + e.message; }
-    }
-    throw new Error('All models failed. Last error: ' + lastError);
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'llama3-8b-8192',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error('Groq error: ' + d.error.message);
+    if (!d.choices || !d.choices[0]) throw new Error('No response: ' + JSON.stringify(d).substring(0,150));
+    return d.choices[0].message.content;
   };
 
   const tasks = [
@@ -393,7 +383,7 @@ async function generatePlan() {
 
   if (doneCount === 0) {
     localStorage.removeItem('gw_apikey');
-    alert('All sections failed. Your Gemini API key may be invalid. Please try again and re-enter your key.');
+    alert('All sections failed. Your Groq API key may be invalid. Please try again and re-enter your key.');
   }
 
   if (doneCount < 4) {
