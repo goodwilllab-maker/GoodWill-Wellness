@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="GoodWill Wellness – AI-powered personalised Indian diet, workout & wellness planner" />
-  <meta name="theme-color" content="#1B6B3A" />
+  <meta name="theme-color" content="#db4f5a" />
   <title>GoodWill Wellness</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -12,10 +12,10 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --pink: #db4f5a; --pink-mid: #e0aaa6; --green-light: #E8F5EE;
-      --brown-dark: #3a3d44; --orange: #E07B2A; --bg: #F7FAF8;
-      --card: #FFFFFF; --border: #D8E8DF; --text: #1A1A1A;
-      --muted: #5A6B5F; --radius: 12px; --shadow: 0 2px 12px rgba(27,107,58,0.08);
+      --green: #db4f5a; --green-mid: #c94450; --green-light: #f2d8d8;
+      --green-dark: #b83a45; --orange: #c94450; --bg: #fdf5f5;
+      --card: #FFFFFF; --border: #e0aba7; --text: #3a3d44;
+      --muted: #7a5f61; --radius: 12px; --shadow: 0 2px 12px rgba(219,79,90,0.08);
     }
     html { scroll-behavior: smooth; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -25,7 +25,7 @@
     .top-bar p { color: rgba(255,255,255,0.7); font-size: 12px; }
     .progress-wrap { background: var(--green-dark); padding: 8px 20px; }
     .progress-bar { height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-    .progress-fill { height: 100%; background: #7ED4A0; border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+    .progress-fill { height: 100%; background: #e0aba7; border-radius: 2px; transition: width 0.4s ease; width: 0%; }
     .progress-label { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 4px; }
     .app { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
@@ -36,7 +36,7 @@
     @media (max-width: 500px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
     .field { display: flex; flex-direction: column; gap: 5px; }
     label { font-size: 12px; font-weight: 500; color: var(--muted); }
-    input, select, textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--border); border-radius: 8px; background: #FAFCFB; color: var(--text); transition: border-color 0.2s; }
+    input, select, textarea { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit; border: 1.5px solid var(--border); border-radius: 8px; background: #fffafa; color: var(--text); transition: border-color 0.2s; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green-mid); background: white; }
     textarea { resize: vertical; min-height: 72px; }
     .bmi-row { font-size: 13px; margin-top: 8px; padding: 8px 12px; background: var(--green-light); border-radius: 8px; display: none; }
@@ -45,23 +45,23 @@
     .chip:hover { border-color: var(--green-mid); color: var(--green); }
     .chip.active { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 500; }
     .speed-note { text-align: center; margin-top: 10px; }
-    .speed-badge { display: inline-flex; align-items: center; gap: 5px; background: #FFF3E0; color: var(--orange); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
+    .speed-badge { display: inline-flex; align-items: center; gap: 5px; background: #f2d8d8; color: #db4f5a; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
     .gen-btn { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .gen-btn:hover { background: var(--green-dark); }
-    .gen-btn:disabled { background: #8EB89E; cursor: not-allowed; }
+    .gen-btn:disabled { background: #e0aba7; cursor: not-allowed; }
     .result-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 20px; box-shadow: var(--shadow); overflow: hidden; display: none; }
     .result-header { background: var(--green); padding: 16px 20px 12px; }
     .result-header h2 { color: white; font-size: 16px; font-weight: 600; }
     .result-header p { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 3px; }
-    .action-bar { display: flex; gap: 8px; padding: 10px 14px; background: #F0F7F3; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .action-bar { display: flex; gap: 8px; padding: 10px 14px; background: #f2d8d8; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
     .act-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: 2px solid; transition: all 0.15s; text-decoration: none; }
-    .act-pdf { background: white; border-color: #E53935; color: #E53935; }
-    .act-pdf:hover { background: #FFEBEE; }
+    .act-pdf { background: white; border-color: #db4f5a; color: #db4f5a; }
+    .act-pdf:hover { background: #f2d8d8; }
     .act-wa { background: white; border-color: #25D366; color: #128C7E; }
     .act-wa:hover { background: #E8F5E9; }
-    .act-copy { background: white; border-color: var(--green-mid); color: var(--green); }
-    .act-copy:hover { background: var(--green-light); }
-    .tabs { display: flex; overflow-x: auto; background: #F8FBF9; border-bottom: 1px solid var(--border); }
+    .act-copy { background: white; border-color: #e0aba7; color: #db4f5a; }
+    .act-copy:hover { background: #f2d8d8; }
+    .tabs { display: flex; overflow-x: auto; background: #fdf5f5; border-bottom: 1px solid var(--border); }
     .tab-btn { padding: 11px 14px; font-size: 13px; font-weight: 500; color: var(--muted); background: transparent; border: none; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; font-family: inherit; transition: all 0.15s; }
     .tab-btn:hover { color: var(--green); }
     .tab-btn.active { color: var(--green); border-bottom-color: var(--green); background: white; }
@@ -78,8 +78,8 @@
     .loading p { font-size: 14px; }
     .foot { text-align: center; padding: 24px 20px 20px; color: var(--muted); font-size: 12px; }
     .foot strong { color: var(--green); }
-    .install-banner { background: var(--orange); color: white; padding: 10px 16px; font-size: 13px; display: none; align-items: center; justify-content: space-between; gap: 10px; }
-    .install-banner button { background: white; color: var(--orange); border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .install-banner { background: #db4f5a; color: white; padding: 10px 16px; font-size: 13px; display: none; align-items: center; justify-content: space-between; gap: 10px; }
+    .install-banner button { background: white; color: #db4f5a; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .install-banner.show { display: flex; }
   </style>
 </head>
@@ -419,7 +419,7 @@ function downloadPDF() {
   const margin = 14;
   const maxW = W - margin * 2;
 
-  doc.setFillColor(27, 107, 58);
+  doc.setFillColor(219, 79, 90);
   doc.rect(0, 0, W, 30, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20); doc.setFont('helvetica', 'bold');
@@ -433,10 +433,10 @@ function downloadPDF() {
   let y = 38;
 
   const sections = [
-    { title: 'DIET PLAN (7-DAY)', key: 'diet', r: 46, g: 125, b: 50 },
-    { title: 'WORKOUT PLAN', key: 'workout', r: 27, g: 107, b: 58 },
-    { title: 'FOODS TO AVOID', key: 'avoid', r: 198, g: 40, b: 40 },
-    { title: 'WELLNESS TIPS', key: 'tips', r: 20, g: 77, b: 43 }
+    { title: 'DIET PLAN (7-DAY)', key: 'diet', r: 219, g: 79, b: 90 },
+    { title: 'WORKOUT PLAN', key: 'workout', r: 201, g: 68, b: 80 },
+    { title: 'FOODS TO AVOID', key: 'avoid', r: 184, g: 58, b: 69 },
+    { title: 'WELLNESS TIPS', key: 'tips', r: 58, g: 61, b: 68 }
   ];
 
   sections.forEach(s => {
@@ -463,7 +463,7 @@ function downloadPDF() {
   const pages = doc.getNumberOfPages();
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
-    doc.setFillColor(240, 247, 243);
+    doc.setFillColor(242, 216, 216);
     doc.rect(0, 284, W, 13, 'F');
     doc.setFontSize(8); doc.setTextColor(100, 120, 110);
     doc.text('GoodWill Wellness  |  Page ' + i + ' of ' + pages + '  |  For guidance only - always consult your doctor', W / 2, 290, { align: 'center' });
