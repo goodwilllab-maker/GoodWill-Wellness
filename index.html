@@ -401,8 +401,7 @@ async function generatePlan() {
   await Promise.allSettled(promises);
 
   if (doneCount === 0) {
-    localStorage.removeItem('gw_apikey');
-    alert('All sections failed. Your Groq API key may be invalid. Please try again and re-enter your key.');
+    alert('All sections failed. Please scroll to bottom and tap "Change Groq API key" to re-enter your key.');
   }
 
   if (doneCount < 4) {
